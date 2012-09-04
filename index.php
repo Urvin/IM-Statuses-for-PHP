@@ -20,6 +20,7 @@ require_once 'classes/tvkstatusgetter.class.php';
 
 //----------------------------------------------------------------------------//
 
+// 'View' for status codes - just text for example
 $lIMStatusesInText = array(
 	enmIMStatus::imsOffline       => 'Offline',
 	enmIMStatus::imsOnline        => 'Online',
@@ -31,6 +32,7 @@ $lIMStatusesInText = array(
 
 //----------------------------------------------------------------------------//
 
+// Creating an array of status getters, an instance for type
 $lImStatusGetters = array();
 $lImStatusGetters['icq']           = new tICQStatusGetter();
 $lImStatusGetters['jabber']        = new tJabberStatusGetter();
@@ -38,6 +40,7 @@ $lImStatusGetters['mail.ru agent'] = new tMRAStatusGetter();
 $lImStatusGetters['skype']         = new tSkypeStatusGetter();
 $lImStatusGetters['vkontakte']     = new tVKStatusGetter();
 
+// Provide your IM identificators for each of status getters
 $lImIdentificators = array(
 	'icq'           => '224052196',
 	'jabber'        => '42d533481a045cbb8463dc358c8f5076',
@@ -48,6 +51,7 @@ $lImIdentificators = array(
 
 //----------------------------------------------------------------------------//
 
+// echo your statuses
 foreach($lImStatusGetters as $lKey => &$lGetter)
 	echo $lKey, ': ', $lIMStatusesInText[$lGetter->getImStatus($lImIdentificators[$lKey])], '<br>', PHP_EOL;
 

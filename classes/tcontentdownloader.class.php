@@ -12,13 +12,28 @@
 
 //----------------------------------------------------------------------------//
 
+/**
+ * Web page content downloader class
+ */
 class tContentDownloader
 {
+	/**
+	 * Use or not use cUrl library, if not - using native PHP functions
+	 * @var bool
+	 */
 	protected $fUseCURL;
+	/**
+	 * cUrl instance
+	 * @var mixed
+	 */
 	protected $fCURL;
 
 	//--------------------------------------------------------------------------//
 
+	/**
+	 * Class constuctor
+	 * @param bool $aUseCurl A parameter that allows use cUrlLibrary
+	 */
 	public function __construct($aUseCurl = true)
 	{
 		$this->fUseCURL = $aUseCurl;
@@ -32,6 +47,9 @@ class tContentDownloader
 
 	//--------------------------------------------------------------------------//
 
+	/**
+	 * Init cUrl instance if allowed
+	 */
 	private function doInitCURL()
 	{
 		if($this->fUseCURL)
@@ -47,6 +65,9 @@ class tContentDownloader
 		}
 	}
 
+	/**
+	 * Destruct cUrl instance
+	 */
 	private function doDestructCURL()
 	{
 		if($this->fCURL)
@@ -55,6 +76,12 @@ class tContentDownloader
 
 	//--------------------------------------------------------------------------//
 
+	/**
+	 * Get contents of $aUrl page
+	 * @param string $aUrl URL of page downloading
+	 * @param bool $aGetHeader Allows including of HTTP headers in answer
+	 * @return string
+	 */
 	public function getURLContents($aUrl, $aGetHeader = false)
 	{
 		$lResult = '';

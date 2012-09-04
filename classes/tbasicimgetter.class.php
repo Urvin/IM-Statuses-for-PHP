@@ -16,6 +16,9 @@ require_once 'tcontentdownloader.class.php';
 
 //----------------------------------------------------------------------------//
 
+/**
+ * IM status codes enum
+ */
 class enmIMStatus
 {
 	const imsOffline       = 0x00;
@@ -26,6 +29,9 @@ class enmIMStatus
 	const imsFreeForChat   = 0x05;
 }
 
+/**
+ * IM error codes enum
+ */
 class enmImError
 {
 	const imeNoError       = 0x00;
@@ -36,20 +42,57 @@ class enmImError
 
 //----------------------------------------------------------------------------//
 
+/**
+ * Basic IM getter status, provides interface an functionality for child getters
+ * Inherit functions doUpdateImStatus and checkImIdentity in children
+ */
 abstract class tBasicIMGetter
 {
+	/**
+	 * tContentDownloader instance
+	 * @var mixed
+	 * @see class tContentDownloader
+	 */
 	protected $fCDownloader;
+	/**
+	 * Cached statuses array in form of identity => status_code
+	 * @var array
+	 */
 	protected $fCachedStatuses;
+	/**
+	 * Last error code
+	 * @var int
+	 * @see class enmImError
+	 */
 	protected $fLastError;
 
+	/**
+	 * Gets the IM status from IM service server and updates cache array.
+	 * @param string $aIdentity IM identificator
+	 */
 	abstract protected function doUpdateImStatus($aIdentity);
+
+	/**
+	 * Checks $aIdentity to match the IM service rules
+	 * @return mixed Boolean false if doesn't match or right Identity if matches
+	 */
 	abstract protected function checkImIdentity($aIdentity);
 
+	/**
+	 * Update status in cache array
+	 * @param string $aIdentity IM identificator
+	 * @param int $aStatus Status code
+	 * @see class enmIMStatus
+	 */
 	protected function doUpdateCachedStatus($aIdentity, $aStatus)
 	{
 		$this->fCachedStatuses[$aIdentity] = $aStatus;
 	}
 
+	/**
+	 * IM Getter constructor
+	 * @param bool $aUseCurl Use cUrl library or use native php functions
+	 */
 	public function __construct($aUseCurl = true)
 	{
 		$this->fCachedStatuses = array();
@@ -57,6 +100,12 @@ abstract class tBasicIMGetter
 		$this->fCDownloader = new tContentDownloader($aUseCurl);
 	}
 
+	/**
+	 * Gets IM status code of $aIdentity identificator
+	 * @param string $aIdentity IM service identificator
+	 * @return int
+	 * @see class enmIMStatus
+	 */
 	public function getImStatus($aIdentity)
 	{
 		$aIdentity = $this->checkImIdentity($aIdentity);
@@ -77,10 +126,26 @@ abstract class tBasicIMGetter
 		}
 	}
 
+	/**
+	 * Preloads statuses into cache array
+	 * @param array $aStatuses Statuses array in form of identity => status_code
+	 */
 	public function preloadStatuses($aStatuses)
 	{
-		foreach($aStatuses as $lIdentity => $lStatus)
-			$this->fCachedStatuses[$lIdentity] = $lStatus;
+		if(is_array($aStatuses) && !empty($aStatuses))
+			foreach($aStatuses as $lIdentity => $lStatus)
+				if(is_numeric($lStatus) && $this->checkImIdentity($lIdentity))
+					$this->doUpdateCachedStatus($lIdentity, $lStatus);
+	}
+
+	/**
+	 * Returns last error code
+	 * @return int
+	 * @see class enmImError
+	 */
+	public function getLastError()
+	{
+		return $this->fLastError;
 	}
 }
 
